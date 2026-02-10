@@ -122,67 +122,6 @@
     cursor: not-allowed;
   }
 
-  /* ── Setup overlay ── */
-  .setup {
-    position: fixed;
-    inset: 0;
-    background: #0d1117;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1.25rem;
-    z-index: 100;
-  }
-
-  .setup.hidden { display: none; }
-
-  .setup-card {
-    width: 100%;
-    max-width: 400px;
-  }
-
-  .setup-card h2 {
-    font-size: 1.25rem;
-    color: #e6edf3;
-    margin-bottom: 0.5rem;
-  }
-
-  .setup-card p {
-    font-size: 0.8rem;
-    color: #7d8590;
-    margin-bottom: 1.25rem;
-    line-height: 1.5;
-  }
-
-  .setup-card input {
-    width: 100%;
-    padding: 1rem;
-    font-size: 0.95rem;
-    font-weight: 500;
-    font-family: inherit;
-    color: #e6edf3;
-    background: #161b22;
-    border: 1.5px solid #30363d;
-    border-radius: 10px;
-    outline: none;
-    margin-bottom: 1rem;
-  }
-
-  .setup-card input:focus { border-color: #00e59a; }
-
-  .setup-card button {
-    width: 100%;
-    padding: 1rem;
-    font-size: 1rem;
-    font-weight: 700;
-    font-family: inherit;
-    color: #0d1117;
-    background: #00e59a;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-  }
-
   .toast {
     position: fixed;
     bottom: 2rem;
@@ -207,16 +146,6 @@
 </style>
 </head>
 <body>
-
-<!-- ── Setup overlay ── -->
-<div class="setup" id="setup">
-  <div class="setup-card">
-    <h2>Setup</h2>
-    <p>Paste your Google Apps Script endpoint URL to connect this tracker.</p>
-    <input type="url" id="endpointInput" placeholder="https://script.google.com/macros/s/AKfycbz1f3FYxDoaTaxJmeAy1FEkjJRUwukJkMOPFyO57JNlvaEYgHMo4smCW5dlfCRClpIn/exec" autocomplete="off" spellcheck="false">
-    <button type="button" id="saveEndpoint">Save</button>
-  </div>
-</div>
 
 <div class="app">
   <h1>Body Tracker</h1>
@@ -243,6 +172,10 @@
         <input type="number" id="hips" inputmode="decimal" step="0.1" min="0" max="200" placeholder="0.0" required>
       </div>
     </div>
+    <div class="field">
+      <label for="exercise">Exercise</label>
+      <input type="text" id="exercise" placeholder="e.g. 30 min run">
+    </div>
     <button type="submit">Submit</button>
   </form>
 </div>
@@ -250,20 +183,14 @@
 <div class="toast" id="toast">Logged</div>
 
 <script>
-// ── ENDPOINT (stored in localStorage) ──
-const STORAGE_KEY = 'apps_script_url';
-let APPS_SCRIPT_URL = localStorage.getItem(STORAGE_KEY) || '';
-
-const setupOverlay = document.getElementById('setup');
-const endpointInput = document.getElementById('endpointInput');
-document.getElementById('saveEndpoint').addEventListener('click', () => {
-  const url = endpointInput.value.trim();
-  if (!url) return;
-  localStorage.setItem(STORAGE_KEY, url);
-  APPS_SCRIPT_URL = url;
-  setupOverlay.classList.add('hidden');
-});
-if (APPS_SCRIPT_URL) setupOverlay.classList.add('hidden');
+const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdZ7cvfrbx6il24_B5shparhtEQjqO2faQSItEABaG2JJQQCw/formResponse';
+const FIELDS = {
+  date:     'entry.563529000',
+  weight:   'entry.841388769',
+  waist:    'entry.1933747550',
+  hips:     'entry.1558876293',
+  exercise: 'entry.208895798'
+};
 
 const form = document.getElementById('form');
 const dateInput = document.getElementById('date');
@@ -289,17 +216,19 @@ form.addEventListener('submit', async (e) => {
   const btn = form.querySelector('button');
   btn.disabled = true;
 
-  const payload = {
-    date: dateInput.value,
-    weight: parseFloat(document.getElementById('weight').value),
-    waist: parseFloat(document.getElementById('waist').value),
-    hips: parseFloat(document.getElementById('hips').value)
-  };
+  const params = new URLSearchParams();
+  params.append(FIELDS.date, dateInput.value);
+  params.append(FIELDS.weight, document.getElementById('weight').value);
+  params.append(FIELDS.waist, document.getElementById('waist').value);
+  params.append(FIELDS.hips, document.getElementById('hips').value);
+  params.append(FIELDS.exercise, document.getElementById('exercise').value);
 
   try {
-    await fetch(APPS_SCRIPT_URL, {
+    await fetch(FORM_URL, {
       method: 'POST',
-      body: JSON.stringify(payload)
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params.toString()
     });
     showToast();
     resetForm();
