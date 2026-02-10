@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#0d1117"/>
+  <g transform="translate(256,256)">
+    <!-- Upward trend line -->
+    <polyline points="-120,60 -40,20 40,-20 120,-80" fill="none" stroke="#00e59a" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Data dots -->
+    <circle cx="-120" cy="60" r="16" fill="#00e59a"/>
+    <circle cx="-40" cy="20" r="16" fill="#00e59a"/>
+    <circle cx="40" cy="-20" r="16" fill="#00e59a"/>
+    <circle cx="120" cy="-80" r="16" fill="#00e59a"/>
+    <!-- Baseline -->
+    <line x1="-140" y1="100" x2="140" y2="100" stroke="#1e2a35" stroke-width="12" stroke-linecap="round"/>
+  </g>
+</svg>
