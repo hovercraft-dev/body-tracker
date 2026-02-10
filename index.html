@@ -73,10 +73,6 @@
     border-color: #00e59a;
   }
 
-  input[type="date"] {
-    color-scheme: dark;
-  }
-
   .unit {
     position: relative;
   }
@@ -151,10 +147,6 @@
   <h1>Body Tracker</h1>
   <form id="form">
     <div class="field">
-      <label for="date">Date</label>
-      <input type="date" id="date" required>
-    </div>
-    <div class="field">
       <label for="weight">Weight</label>
       <div class="unit" data-unit="kg">
         <input type="number" id="weight" inputmode="decimal" step="0.1" min="0" max="300" placeholder="0.0" required>
@@ -185,7 +177,6 @@
 <script>
 const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdZ7cvfrbx6il24_B5shparhtEQjqO2faQSItEABaG2JJQQCw/formResponse';
 const FIELDS = {
-  date:     'entry.563529000',
   weight:   'entry.841388769',
   waist:    'entry.1933747550',
   hips:     'entry.1558876293',
@@ -193,17 +184,10 @@ const FIELDS = {
 };
 
 const form = document.getElementById('form');
-const dateInput = document.getElementById('date');
 const toast = document.getElementById('toast');
-
-function todayStr() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
 
 function resetForm() {
   form.reset();
-  dateInput.value = todayStr();
 }
 
 function showToast() {
@@ -217,7 +201,6 @@ form.addEventListener('submit', async (e) => {
   btn.disabled = true;
 
   const params = new URLSearchParams();
-  params.append(FIELDS.date, dateInput.value);
   params.append(FIELDS.weight, document.getElementById('weight').value);
   params.append(FIELDS.waist, document.getElementById('waist').value);
   params.append(FIELDS.hips, document.getElementById('hips').value);
